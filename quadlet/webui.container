@@ -1,0 +1,18 @@
+[Unit]
+Description=Postbot WebUI (Django admin)
+After=postbot.service
+
+[Container]
+Image=philippbtz/mattermost-webui:latest
+ContainerName=webui
+Network=internal.network
+PublishPort=8080:8080
+EnvironmentFile=%h/postbot/.env
+Volume=%h/postbot/data/webui:/app/data:z
+Volume=%h/postbot/data/certs:/app/certs:ro,z
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

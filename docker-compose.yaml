@@ -1,0 +1,27 @@
+services:
+  postbot:
+    image: philippbtz/mattermost-postbot:latest
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./data/postbot:/app/data
+    networks:
+      - internal
+    restart: unless-stopped
+
+  webui:
+    image: philippbtz/mattermost-webui:latest
+    env_file: .env
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+    depends_on:
+      - postbot
+    volumes:
+      - ./data/webui:/app/data
+      - ./data/certs:/app/certs:ro
+    restart: unless-stopped
+
+networks:
+  internal:
+    driver: bridge

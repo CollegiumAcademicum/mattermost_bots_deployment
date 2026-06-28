@@ -1,5 +1,5 @@
-podman pull philippbtz/mattermost-postbot:latest
-systemctl --user restart postbot
+#!/usr/bin/env bash
+set -e
 
-podman pull philippbtz/mattermost-webui:latest
-systemctl --user restart webui
+podman compose pull
+podman compose up -d

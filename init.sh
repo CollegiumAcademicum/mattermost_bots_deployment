@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# Pull latest images
+# Pull latest images and restart (stops existing containers first)
 podman compose pull
-
-# Start services
+podman compose down
 podman compose up -d
 
 # Verify

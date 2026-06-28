@@ -2,8 +2,8 @@ services:
   postbot:
     image: philippbtz/mattermost-postbot:latest
     volumes:
-      - ./.env:/app/.env:ro
-      - ./data/postbot:/app/data
+      - ./.env:/app/.env:ro,z
+      - ./data/postbot:/app/data:z
     networks:
       - internal
     restart: unless-stopped
@@ -18,8 +18,8 @@ services:
     depends_on:
       - postbot
     volumes:
-      - ./data/webui:/app/data
-      - ./data/certs:/app/certs:ro
+      - ./data/webui:/app/data:z
+      - ./data/certs:/app/certs:ro,z
     restart: unless-stopped
 
 networks:

@@ -7,12 +7,42 @@ Deploys **postbot** (Mattermost broadcast bot) and **webui** (Django admin) as r
 - Podman and podman-compose installed on the server
 - The container images published to Docker Hub (`./publish.sh` from the main repo)
 
-## Deploy
+## Fresh server setup
+
+Run the bootstrap script — it clones the repo, sets up the systemd service, and prepares all directories:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/CollegiumAcademicum/mattermost_bots_deployment/main/setup.sh | bash
+```
+
+Then fill in the required values in `~/postbot/.env`:
+
+```bash
+nano ~/postbot/.env   # fill in all CHANGE_ME values
+```
+
+Optionally place your LDAP CA certificate:
+
+```bash
+cp /path/to/ca.pem ~/postbot/data/certs/ca.pem
+```
+
+Finally, pull images and start:
+
+```bash
+cd ~/postbot && ./start.sh
+```
+
+After this the stack starts automatically at every boot.
+
+---
+
+## Manual setup (alternative)
 
 ### 1. Clone the repo
 
 ```bash
-git clone <repo-url> ~/postbot
+git clone https://github.com/CollegiumAcademicum/mattermost_bots_deployment.git ~/postbot
 cd ~/postbot
 ```
 
@@ -20,23 +50,23 @@ cd ~/postbot
 
 ```bash
 cp .env.example .env
-nano .env   # fill in all [ChangeME] values
+nano .env   # fill in all CHANGE_ME values
 ```
 
-### 3. Run init
+### 3. Install the systemd service
 
 ```bash
-./init.sh
+mkdir -p ~/.config/systemd/user
+cp mattermost-bots.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable mattermost-bots.service
+loginctl enable-linger $USER   # start at boot without login
 ```
 
-This pulls the latest images, starts both services, and shows their status.
-
-### 4. Verify
+### 4. Start
 
 ```bash
-podman compose ps
-podman compose logs -f postbot
-podman compose logs -f webui
+./start.sh
 ```
 
 ---
@@ -46,7 +76,7 @@ podman compose logs -f webui
 Pull the latest images and restart:
 
 ```bash
-./update.sh
+./start.sh
 ```
 
 ---
@@ -57,15 +87,19 @@ Pull the latest images and restart:
 ~/postbot/
 ├── .env                      # secrets — never commit this
 ├── docker-compose.yaml
-├── data/
-│   ├── postbot/              → mounted into postbot at /app/data
-│   │   ├── channels.toml     # channel group configuration
-│   │   ├── broadcast_log.db
-│   │   ├── tasks/            # custom task plugins (.py files)
-│   │   └── logs/
-│   ├── webui/                → mounted into webui at /app/data
-│   └── certs/                → mounted into webui at /app/certs (read-only)
-│       └── ca.pem            # LDAP CA certificate — required if using LDAP over TLS
+├── mattermost-bots.service   # systemd unit (installed by setup.sh)
+├── setup.sh                  # bootstrap script for fresh servers
+├── start.sh                  # pull latest images and restart
+├── stop.sh                   # stop all containers
+└── data/
+    ├── postbot/              → mounted into postbot at /app/data
+    │   ├── channels.toml     # channel group configuration
+    │   ├── broadcast_log.db
+    │   ├── tasks/            # custom task plugins (.py files)
+    │   └── logs/
+    ├── webui/                → mounted into webui at /app/data
+    └── certs/                → mounted into webui at /app/certs (read-only)
+        └── ca.pem            # LDAP CA certificate — required if using LDAP over TLS
 ```
 
 ---
@@ -102,4 +136,12 @@ sudo ufw allow 8080/tcp
 **`podman compose pull` fails with auth error**
 ```bash
 podman login docker.io
+```
+
+**Service not starting at boot**
+
+Make sure linger is enabled — without it the user service only starts on login:
+```bash
+loginctl enable-linger $USER
+loginctl show-user $USER | grep Linger   # should show Linger=yes
 ```

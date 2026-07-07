@@ -57,9 +57,9 @@ nano .env   # fill in all CHANGE_ME values
 
 ```bash
 mkdir -p ~/.config/systemd/user
-cp mattermost-bots.service ~/.config/systemd/user/
+cp postbot.service ~/.config/systemd/user/
 systemctl --user daemon-reload
-systemctl --user enable mattermost-bots.service
+systemctl --user enable postbot.service
 loginctl enable-linger $USER   # start at boot without login
 ```
 
@@ -87,7 +87,7 @@ Pull the latest images and restart:
 ~/postbot/
 ├── .env                      # secrets — never commit this
 ├── docker-compose.yaml
-├── mattermost-bots.service   # systemd unit (installed by setup.sh)
+├── postbot.service           # systemd unit (installed by setup.sh)
 ├── setup.sh                  # bootstrap script for fresh servers
 ├── start.sh                  # pull latest images and restart
 ├── stop.sh                   # stop all containers

@@ -6,7 +6,7 @@ set -euo pipefail
 
 REPO_URL="https://github.com/CollegiumAcademicum/mattermost_bots_deployment.git"
 INSTALL_DIR="$HOME/postbot"
-SERVICE_NAME="mattermost-bots"
+SERVICE_NAME="postbot"
 SYSTEMD_DIR="$HOME/.config/systemd/user"
 
 # ── helpers ────────────────────────────────────────────────────────────────

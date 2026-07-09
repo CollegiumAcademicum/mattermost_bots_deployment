@@ -5,7 +5,9 @@
 set -euo pipefail
 
 REPO_URL="https://github.com/CollegiumAcademicum/mattermost_bots_deployment.git"
-INSTALL_DIR="$HOME/postbot"
+SRV_DIR="/srv/containers/www/home/postbot"
+INSTALL_DIR="$SRV_DIR"
+LINK_DIR="$HOME/postbot"
 SERVICE_NAME="postbot"
 SYSTEMD_DIR="$HOME/.config/systemd/user"
 
@@ -29,7 +31,18 @@ if [ -d "$INSTALL_DIR/.git" ]; then
     git -C "$INSTALL_DIR" pull
 else
     info "Cloning repo to $INSTALL_DIR..."
+    mkdir -p "$(dirname "$INSTALL_DIR")"
     git clone "$REPO_URL" "$INSTALL_DIR"
+fi
+
+# Create $HOME/postbot symlink following the /srv convention used by other services
+if [ -L "$LINK_DIR" ]; then
+    info "Symlink $LINK_DIR already exists — skipping."
+elif [ -d "$LINK_DIR" ]; then
+    warn "$LINK_DIR is a real directory (legacy install). Move its contents to $INSTALL_DIR if needed, then remove it and re-run this script."
+else
+    ln -s "$INSTALL_DIR" "$LINK_DIR"
+    info "Created symlink: $LINK_DIR -> $INSTALL_DIR"
 fi
 
 cd "$INSTALL_DIR"

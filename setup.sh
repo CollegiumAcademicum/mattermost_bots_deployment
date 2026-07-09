@@ -9,7 +9,7 @@ SRV_DIR="/srv/containers/www/home/postbot"
 INSTALL_DIR="$SRV_DIR"
 LINK_DIR="$HOME/postbot"
 SERVICE_NAME="postbot"
-SYSTEMD_DIR="$HOME/.config/systemd/user"
+SYSTEMD_DIR="/etc/systemd/system"
 
 # ── helpers ────────────────────────────────────────────────────────────────
 info()  { echo "[setup] $*"; }
@@ -65,21 +65,12 @@ mkdir -p data/postbot/logs data/postbot/tasks data/webui data/certs
 
 # ── 5. systemd user service ──────────────────────────────────────────────────
 if command -v systemctl >/dev/null 2>&1; then
-    info "Installing systemd user service..."
-    mkdir -p "$SYSTEMD_DIR"
+    info "Installing systemd system service..."
     cp "$INSTALL_DIR/$SERVICE_NAME.service" "$SYSTEMD_DIR/$SERVICE_NAME.service"
 
-    systemctl --user daemon-reload
-    systemctl --user enable "$SERVICE_NAME.service"
-    info "Service enabled (will start at login / after linger is set)."
-
-    # Enable linger so the user service survives logout and starts at boot
-    if command -v loginctl >/dev/null 2>&1; then
-        loginctl enable-linger "$USER"
-        info "Linger enabled for $USER — service will start at boot without login."
-    else
-        warn "loginctl not found. Run 'loginctl enable-linger $USER' manually to enable boot start."
-    fi
+    systemctl daemon-reload
+    systemctl enable "$SERVICE_NAME.service"
+    info "Service enabled — will start at boot."
 else
     warn "Skipped systemd setup — run manually if needed."
 fi

@@ -6,10 +6,10 @@ After=network-online.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=%h/postbot
+WorkingDirectory=/srv/containers/www/home/postbot
 ExecStart=/usr/bin/podman compose up -d
 ExecStop=/usr/bin/podman compose down
 TimeoutStartSec=120
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

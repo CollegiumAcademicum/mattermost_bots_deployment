@@ -1,6 +1,6 @@
 services:
   postbot:
-    image: philippbtz/mattermost-postbot:latest
+    image: docker.io/philippbtz/mattermost-postbot:latest
     volumes:
       - ./.env:/app/.env:ro,z
       - ./data/postbot:/app/data:z
@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
 
   webui:
-    image: philippbtz/mattermost-webui:latest
+    image: docker.io/philippbtz/mattermost-webui:latest
     env_file: .env
     networks:
       - internal

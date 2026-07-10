@@ -1,6 +1,8 @@
 services:
   postbot:
     image: docker.io/philippbtz/mattermost-postbot:latest
+    labels:
+      io.containers.autoupdate: registry
     volumes:
       - ./.env:/app/.env:ro,z
       - ./data/postbot:/app/data:z
@@ -10,6 +12,8 @@ services:
 
   webui:
     image: docker.io/philippbtz/mattermost-webui:latest
+    labels:
+      io.containers.autoupdate: registry
     env_file: .env
     networks:
       - internal

@@ -1,0 +1,9 @@
+[Unit]
+Description=Update Mattermost Bots images
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/containers/www/home/postbot
+ExecStart=/usr/bin/podman compose pull
+ExecStart=/usr/bin/systemctl restart postbot.service

@@ -65,12 +65,15 @@ mkdir -p data/postbot/logs data/postbot/tasks data/webui data/certs
 
 # ── 5. systemd user service ──────────────────────────────────────────────────
 if command -v systemctl >/dev/null 2>&1; then
-    info "Installing systemd system service..."
-    cp "$INSTALL_DIR/$SERVICE_NAME.service" "$SYSTEMD_DIR/$SERVICE_NAME.service"
+    info "Installing systemd system service and update timer..."
+    cp "$INSTALL_DIR/$SERVICE_NAME.service"        "$SYSTEMD_DIR/$SERVICE_NAME.service"
+    cp "$INSTALL_DIR/$SERVICE_NAME-update.service" "$SYSTEMD_DIR/$SERVICE_NAME-update.service"
+    cp "$INSTALL_DIR/$SERVICE_NAME-update.timer"   "$SYSTEMD_DIR/$SERVICE_NAME-update.timer"
 
     systemctl daemon-reload
     systemctl enable "$SERVICE_NAME.service"
-    info "Service enabled — will start at boot."
+    systemctl enable --now "$SERVICE_NAME-update.timer"
+    info "Service enabled and nightly update timer active."
 else
     warn "Skipped systemd setup — run manually if needed."
 fi
